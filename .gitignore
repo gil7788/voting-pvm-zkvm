@@ -40,3 +40,8 @@ contracts/.deploys/deployed-contracts/
 
 # Misc
 .trash/
+
+# Rust
+**/target/
+**/.cargo/
+**/*.rs.bk
