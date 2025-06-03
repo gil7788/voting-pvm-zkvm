@@ -1,0 +1,40 @@
+# Root
+node_modules/
+.pnpm-store/
+pnpm-lock.yaml
+
+# Environment files
+.env
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Vite build output
+frontend/dist/
+frontend/.vite/
+
+# Contracts build output (optional - depending on tooling)
+contracts/artifacts/
+contracts/cache/
+contracts/typechain/
+contracts/dist/
+contracts/build/
+
+# Remix or hardhat
+contracts/.env
+contracts/.coverage/
+contracts/.openzeppelin/
+
+# Misc
+.trash/
