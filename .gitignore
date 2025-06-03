@@ -35,6 +35,8 @@ contracts/build/
 contracts/.env
 contracts/.coverage/
 contracts/.openzeppelin/
+contracts/.build/
+contracts/.deploys/deployed-contracts/
 
 # Misc
 .trash/

@@ -1,3 +1,10 @@
+# Zero Knowledge Voting on Polkadot Virtual Machine!
+
+This repository demostrates a ZK voting machine on chain!
+
+## Repository structure
+The repository is initialized using 
+
 # react-solidity template
 
 This template sets up a combination of Solidity smart contracts and a React front-end app that interacts with these
