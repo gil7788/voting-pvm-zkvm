@@ -28,8 +28,6 @@ members = [
   "risc0/zkvm/receipts",
   "rzup",
   "tools/hotbench",
-  "website/doc-test/main",
-  "xtask",
 ]
 exclude = ["tools/crates-validator"]
 

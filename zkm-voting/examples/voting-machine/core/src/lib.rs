@@ -48,7 +48,7 @@ pub struct InitializeVotingMachineCommit {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Ballot {
-    pub voter: u32,
+    pub voter: [u8; 20],
     pub vote_yes: bool,
 }
 
@@ -58,7 +58,7 @@ pub struct SubmitBallotCommit {
     pub new_state: Digest,
     pub polls_open: bool,
     pub voter_bitfield: u32,
-    pub voter: u32,
+    pub voter: [u8; 20],
     pub vote_yes: bool,
     pub vote_counted: bool,
 }
@@ -82,14 +82,22 @@ impl SubmitBallotParams {
     }
 
     pub fn process(&self) -> SubmitBallotResult {
-        let mut state = self.state.clone();
-        let vote_counted = state.vote(self.ballot.voter, self.ballot.vote_yes);
-        SubmitBallotResult {
-            state,
-            vote_counted,
-            vote_yes: self.ballot.vote_yes,
-        }
+    let mut state = self.state.clone();
+
+    let voter_id = u32::from_le_bytes([
+        self.ballot.voter[0],
+        self.ballot.voter[1],
+        self.ballot.voter[2],
+        self.ballot.voter[3],
+    ]);
+
+    let vote_counted = state.vote(voter_id, self.ballot.vote_yes);
+    SubmitBallotResult {
+        state,
+        vote_counted,
+        vote_yes: self.ballot.vote_yes,
     }
+}
 }
 
 #[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
