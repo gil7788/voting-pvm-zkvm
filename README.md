@@ -2,6 +2,8 @@
 
 This repository demostrates a ZK voting machine on chain, as well showcases additional technical improvments that were required in order to facilitate ZK voting on Passet Hub.
 
+![Zero Knowledge Vote](./assets/zk_vote.png)
+
 ## Introduced changes:
 
 1. Created a .gitignore file that helps manage files VCS
