@@ -18,6 +18,7 @@ use voting_machine_core::{
     InitializeVotingMachineCommit, SubmitBallotCommit, SubmitBallotParams, VotingMachineState,
 };
 use voting_machine_methods::{FREEZE_ELF, FREEZE_ID, INIT_ELF, INIT_ID, SUBMIT_ELF, SUBMIT_ID};
+pub mod eth_client;
 
 pub struct InitMessage {
     receipt: Receipt,
@@ -114,9 +115,16 @@ impl PollingStation {
 
 #[cfg(test)]
 mod tests {
+    use hex_literal::hex;
     use test_log::test;
 
     use super::*;
+
+    fn u32_to_eth(v: u32) -> [u8; 20] {
+        let mut out = [0u8; 20];
+        out[..4].copy_from_slice(&v.to_le_bytes());
+        out
+    }
 
     #[test]
     fn protocol() {
@@ -129,27 +137,27 @@ mod tests {
         let mut polling_station = PollingStation::new(polling_station_state);
 
         let ballot1 = Ballot {
-            voter: 0,
+            voter: u32_to_eth(0),
             vote_yes: false,
         };
         let ballot2 = Ballot {
-            voter: 1,
+            voter: u32_to_eth(1),
             vote_yes: true,
         };
         let ballot3 = Ballot {
-            voter: 2,
+            voter: u32_to_eth(2),
             vote_yes: true,
         };
         let ballot4 = Ballot {
-            voter: 1,
+            voter: u32_to_eth(1),
             vote_yes: false,
         };
         let ballot5 = Ballot {
-            voter: 3,
+            voter: u32_to_eth(3),
             vote_yes: false,
         };
         let ballot6 = Ballot {
-            voter: 4,
+            voter: u32_to_eth(4),
             vote_yes: true,
         };
 
@@ -164,29 +172,75 @@ mod tests {
 
         assert_eq!(polling_station.state.count, 2);
 
-        let init_state = init_msg.verify_and_get_commit();
-        let ballot_commit1 = ballot_msg1.verify_and_get_commit();
-        let ballot_commit2 = ballot_msg2.verify_and_get_commit();
-        let ballot_commit3 = ballot_msg3.verify_and_get_commit();
-        let ballot_commit4 = ballot_msg4.verify_and_get_commit();
-        let ballot_commit5 = ballot_msg5.verify_and_get_commit();
-        let close_state = close_msg.verify_and_get_commit();
-        let ballot_commit6 = ballot_msg6.verify_and_get_commit();
+        let _ = init_msg.verify_and_get_commit();
+        let _ = ballot_msg1.verify_and_get_commit();
+        let _ = ballot_msg2.verify_and_get_commit();
+        let _ = ballot_msg3.verify_and_get_commit();
+        let _ = ballot_msg4.verify_and_get_commit();
+        let _ = ballot_msg5.verify_and_get_commit();
+        let _ = close_msg.verify_and_get_commit();
+        let _ = ballot_msg6.verify_and_get_commit();
+    }
 
-        tracing::info!("initial commit: {:?}", init_state);
-        tracing::info!("ballot 1: {:?}", ballot1);
-        tracing::info!("ballot 1 commit: {:?}", ballot_commit1);
-        tracing::info!("ballot 2: {:?}", ballot2);
-        tracing::info!("ballot 2 commit: {:?}", ballot_commit2);
-        tracing::info!("ballot 3: {:?}", ballot3);
-        tracing::info!("ballot 3 commit: {:?}", ballot_commit3);
-        tracing::info!("ballot 4: {:?}", ballot4);
-        tracing::info!("ballot 4 commit: {:?}", ballot_commit4);
-        tracing::info!("ballot 5: {:?}", ballot5);
-        tracing::info!("ballot 5 commit: {:?}", ballot_commit5);
-        tracing::info!("freeze commit: {:?}", close_state);
-        tracing::info!("ballot 6: {:?}", ballot6);
-        tracing::info!("ballot 6 commit: {:?}", ballot_commit6);
-        tracing::info!("Final vote count: {:?}", polling_station.state.count);
+    #[test]
+    fn protocol_with_eth_keys() {
+        let polling_station_state = VotingMachineState {
+            polls_open: true,
+            voter_bitfield: 0,
+            count: 0,
+        };
+
+        let mut polling_station = PollingStation::new(polling_station_state);
+
+        let voter0 = hex!("1111111111111111111111111111111111111111");
+        let voter1 = hex!("2222222222222222222222222222222222222222");
+        let voter2 = hex!("3333333333333333333333333333333333333333");
+        let voter3 = hex!("4444444444444444444444444444444444444444");
+        let voter4 = hex!("5555555555555555555555555555555555555555");
+
+        let ballot1 = Ballot {
+            voter: voter0,
+            vote_yes: false,
+        };
+        let ballot2 = Ballot {
+            voter: voter1,
+            vote_yes: true,
+        };
+        let ballot3 = Ballot {
+            voter: voter2,
+            vote_yes: true,
+        };
+        let ballot4 = Ballot {
+            voter: voter1,
+            vote_yes: false,
+        };
+        let ballot5 = Ballot {
+            voter: voter3,
+            vote_yes: false,
+        };
+        let ballot6 = Ballot {
+            voter: voter4,
+            vote_yes: true,
+        };
+
+        let init_msg = polling_station.init().unwrap();
+        let ballot_msg1 = polling_station.submit(&ballot1).unwrap();
+        let ballot_msg2 = polling_station.submit(&ballot2).unwrap();
+        let ballot_msg3 = polling_station.submit(&ballot3).unwrap();
+        let ballot_msg4 = polling_station.submit(&ballot4).unwrap();
+        let ballot_msg5 = polling_station.submit(&ballot5).unwrap();
+        let close_msg = polling_station.freeze().unwrap();
+        let ballot_msg6 = polling_station.submit(&ballot6).unwrap();
+
+        assert_eq!(polling_station.state.count, 2);
+
+        let _ = init_msg.verify_and_get_commit();
+        let _ = ballot_msg1.verify_and_get_commit();
+        let _ = ballot_msg2.verify_and_get_commit();
+        let _ = ballot_msg3.verify_and_get_commit();
+        let _ = ballot_msg4.verify_and_get_commit();
+        let _ = ballot_msg5.verify_and_get_commit();
+        let _ = close_msg.verify_and_get_commit();
+        let _ = ballot_msg6.verify_and_get_commit();
     }
 }

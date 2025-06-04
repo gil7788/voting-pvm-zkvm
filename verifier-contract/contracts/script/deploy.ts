@@ -14,6 +14,8 @@ if (ENV === "testnet") {
 }
 
 if (ENV === "sepolia") {
+  // Deployed verifier to sepolia:
+  // 0xbF8b89C7E818fda93C947e8d15c17BA19535196f 
   RPC_URL = "https://1rpc.io/sepolia";
   privateKey = "51bb3bf9f58318135dcc3d19c40902c2cf43d7d7d300afca18bbbbcc459873d6";
 }
