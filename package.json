@@ -18,8 +18,9 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-network-helpers": "^1.0.12",
+    "@parity/hardhat-polkadot": "^0.1.6",
+    "@parity/resolc": "^0.2.0",
     "@remix-project/remixd": "^0.6.40",
-    "hardhat": "^2.24.1",
     "typescript": "~5.6.2"
   }
 }
