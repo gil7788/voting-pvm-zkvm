@@ -12,9 +12,10 @@
   "devDependencies": {
     "@parity/hardhat-polkadot": "^0.1.6",
     "dotenv": "^16.5.0",
-    "solc": "^0.8.20"
+    "solc": "0.8.20"
   },
   "dependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0"
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "run-container": "^2.0.12"
   }
 }
