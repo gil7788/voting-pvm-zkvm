@@ -23,7 +23,7 @@
     "@scure/bip39": "^1.5.1",
     "dotenv": "^16.5.0",
     "ethers": "^6.13.4",
-    "hardhat": "^2.24.1",
+    "@parity/hardhat-polkadot": "^0.1.4",
     "micro-sr25519": "^0.1.0"
   }
 }

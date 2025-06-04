@@ -3,8 +3,8 @@ import path from "path";
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
 
 // const ENV: string ="local";
-// const ENV: string ="testnet";
-const ENV: string ="sepolia";
+const ENV: string ="testnet";
+// const ENV: string ="sepolia";
 let RPC_URL = "";
 let privateKey = "";
 
