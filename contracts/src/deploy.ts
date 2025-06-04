@@ -2,7 +2,6 @@ import { ethers, Interface, BytesLike, Wallet } from "ethers";
 import path from "path";
 import { readdirSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 
-
 // based on https://github.com/paritytech/contracts-boilerplate/tree/e86ffe91f7117faf21378395686665856c605132/ethers/tools
 
 // if (!process.env.ACCOUNT_SEED) {
@@ -30,39 +29,57 @@ const contractsOutDir = path.join(buildDir, "contracts");
 const deploysDir = path.join(".deploys", "deployed-contracts");
 mkdirSync(deploysDir, { recursive: true });
 
-const contracts = readdirSync(contractsOutDir).filter((f) => f.endsWith(".json"));
+// Contracts to deploy
+const contracts = ["Storage.json", "TimelockController.json"];
 
+// Define constructor arguments per contract
+const constructorArgs: Record<string, any[]> = {
+  TimelockController: [
+    1, // minDelay (1 hour)
+    [wallet.address], // proposers
+    [wallet.address], // executors
+    wallet.address // admin
+  ],
+  Storage: [] // no args
+};
+
+// Contract type
 type Contract = {
-  abi: Interface,
-  bytecode: BytesLike,
-}
+  abi: Interface;
+  bytecode: BytesLike;
+};
 
 (async () => {
   for (const file of contracts) {
     const name = path.basename(file, ".json");
-    const contract = JSON.parse(readFileSync(path.join(contractsOutDir, file), "utf8")) as Contract;
-    const factory = new ethers.ContractFactory(
-      contract.abi,
-      contract.bytecode,
-      wallet
+    const filePath = path.join(contractsOutDir, file);
+    const contract = JSON.parse(readFileSync(filePath, "utf8")) as Contract;
+
+    const factory = new ethers.ContractFactory(contract.abi, contract.bytecode, wallet);
+    const args = constructorArgs[name] ?? [];
+
+    console.log(`🚀 Deploying contract ${name} with args:`, args);
+
+    const deployedContract = await factory.deploy(...args);
+    await deployedContract.waitForDeployment();
+
+    const address = await deployedContract.getAddress();
+    console.log(`✅ Deployed ${name} at: ${address}`);
+
+    const fileContent = JSON.stringify(
+      {
+        name,
+        address,
+        abi: contract.abi,
+        deployedAt: Date.now()
+      },
+      null,
+      2
     );
 
-    console.log(`Deploying contract ${name}...`);
-    const deployedContract = await factory.deploy();
-    await deployedContract.waitForDeployment();
-    const address = await deployedContract.getAddress();
-
-    console.log(`Deployed contract ${name}: ${address}`);
-
-    const fileContent = JSON.stringify({
-      name,
-      address,
-      abi: contract.abi,
-      deployedAt: Date.now()
-    }, null, 2);
     writeFileSync(path.join(deploysDir, `${address}.json`), fileContent);
   }
-})().catch(err => {
-  console.error(err);
+})().catch((err) => {
+  console.error("❌ Deployment failed:", err);
   process.exit(1);
 });
