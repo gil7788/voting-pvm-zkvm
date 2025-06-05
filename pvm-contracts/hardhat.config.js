@@ -5,7 +5,7 @@ require("@parity/hardhat-polkadot");
 require("dotenv").config();
 //   accounts: ["51bb3bf9f58318135dcc3d19c40902c2cf43d7d7d300afca18bbbbcc459873d6"],
 const privateKey = process.env.PRIVATE_KEY;
-console.log(`privateKey: ${privateKey}`);
+// console.log(`privateKey: ${privateKey}`);
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -44,3 +44,6 @@ module.exports = {
     }
   },
 };
+// export PRIVATE_KEY=0x<PRIVATE-KEY>
+// npx hardhat compile
+// npx hardhat ignition deploy ignition/modules/VotingMachine.js --network passetHub
